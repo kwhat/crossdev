@@ -1541,7 +1541,12 @@ set_portage() {
 			force+=" multilib"
 			;;
 		*)
-			mask+=" multilib"
+			if [[ ${MULTILIB_USE} == "yes" ]] ; then
+				mask+=" -multilib"
+				force+=" multilib"
+			else
+				mask+=" multilib"
+			fi
 			;;
 	esac
 
