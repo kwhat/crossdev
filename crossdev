@@ -1960,7 +1960,9 @@ if ! ex_fast ; then
 		# first install headers if requested
 		if with_headers ; then
 			# install kernel headers (since the C library often uses them)
-			USE="${KUSE} ${USE} headers-only" doemerge ${KPKG} ${KPKG}-quick
+			USE="${KUSE} ${USE} headers-only" \
+			EOPTS="${EOPTS}$(is_s2 && printf ' --buildpkg=n')" \
+				doemerge ${KPKG} ${KPKG}-quick
 
 			if [[ -n ${LPKG} ]] ; then
 				# install C library headers
@@ -1968,7 +1970,7 @@ if ! ex_fast ; then
 				# a dependency on newer gcc versions that we don't
 				# care about at this point -- we aren't compiling yet
 				USE="${LUSE} ${USE} ${LUSE_DISABLE} headers-only" \
-				EOPTS="${EOPTS} --nodeps" \
+				EOPTS="${EOPTS} --nodeps$(is_s3 && printf ' --buildpkg=n')" \
 					doemerge ${LPKG} ${LPKG}-headers
 			fi
 		fi
@@ -1980,6 +1982,7 @@ if ! ex_fast ; then
 				doemerge ${RPKG}
 		else
 			USE="${GUSE} ${USE} ${GUSE_DISABLE_STAGE_1}" \
+			EOPTS="${EOPTS}$(is_s4 && printf ' --buildpkg=n')" \
 				doemerge ${GPKG} ${GPKG}-stage1
 		fi
 
@@ -1990,6 +1993,7 @@ if ! ex_fast ; then
 		set_eopts_on_pkg_status ${KPKG} headers-only
 
 		USE="${KUSE} ${USE} headers-only" \
+		EOPTS="${EOPTS}$([[ ${K2PKG} != "[none]" ]] && printf ' --buildpkg=n')" \
 			doemerge ${KPKG} ${KPKG}-stage1
 
 		if [[ ${K2PKG} != "[none]" ]] ; then
@@ -1998,6 +2002,7 @@ if ! ex_fast ; then
 			set_eopts_on_pkg_status ${K2PKG} headers-only
 
 			USE="${KUSE} ${USE} headers-only" \
+			EOPTS="${EOPTS}$(is_s3 && printf ' --buildpkg=n')" \
 				doemerge ${K2PKG} ${K2PKG}-stage1
 
 			# Go again now we have it.
@@ -2011,6 +2016,7 @@ if ! ex_fast ; then
 			set_eopts_on_pkg_status ${K3PKG} headers-only
 
 			USE="${KUSE} ${USE} headers-only" \
+			EOPTS="${EOPTS}$(is_s3 && printf ' --buildpkg=n')" \
 				doemerge ${K3PKG} ${K3PKG}-stage1
 		fi
 	fi
