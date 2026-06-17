@@ -105,13 +105,6 @@ PKG_CONFIG_ESYSROOT_DIR=${PKG_CONFIG_SYSROOT_DIR}${PREFIX}
 # https://github.com/pkgconf/pkgconf/issues/205
 export PKG_CONFIG_FDO_SYSROOT_RULES=1
 
-# Don't trust PKG_CONFIG_PATH unless it is pointing within a Gentoo build
-# environment to find bundled dependencies.
-case ${PKG_CONFIG_PATH} in
-	"${WORKDIR:-unset}"/*) ;;
-	*) unset PKG_CONFIG_PATH ;;
-esac
-
 #
 # Try and figure out the appropriate libdir for this target.
 # This logic matches Gentoo's get_libdir which uses $ABI.
@@ -136,29 +129,4 @@ export \
 #
 PKG_CONFIG_LIBDIR="${PKG_CONFIG_LIBDIR}${PKG_CONFIG_LIBDIR:+:}${PKG_CONFIG_ESYSROOT_DIR}/usr/${libdir}/pkgconfig:${PKG_CONFIG_ESYSROOT_DIR}/usr/share/pkgconfig"
 
-#
-# Sanity check the output to catch common errors that do not
-# cause failures until much later on.
-#
-output=$("${REAL_PKG_CONFIG}" "$@")
-ret=$?
-
-# We turn the output into a newline separate string of options, then use grep
-# to look for bad -Is and -Ls.  Bad -Is and -Ls are ones that point to things
-# outside the ${PKG_CONFIG_ESYSROOT_DIR} or Gentoo's ${WORKDIR}.
-bad_lines=$(
-	printf "%s\n" ${output} | # Put each flag on its own line.
-	grep '^-[LI]' | # Find all -I and -L lines.
-	grep -v "^..${PKG_CONFIG_ESYSROOT_DIR}${WORKDIR:+\|^..${WORKDIR}}" # Find all things outside the sysroot or WORKDIR.
-)
-if [ -n "${bad_lines}" ] ; then
-	warn "### falling down so here is a dump state ######"
-	"${REAL_PKG_CONFIG}" --debug "$@" 1>&2
-	warn "### end of dump ###############################"
-	warn "### suspicious compile flags dumped here ######"
-	printf "%s\n" "${bad_lines}"
-	warn "### end of flag dump ##########################"
-	error "host -I or -L paths detected: ${output}"
-fi
-[ -n "${output}" ] && printf "%s\n" "${output}"
-exit ${ret}
+exec "${REAL_PKG_CONFIG}" "$@"
