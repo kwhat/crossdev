@@ -61,3 +61,6 @@ screen_cv_sys_terminfo_used=${screen_cv_sys_terminfo_used=yes}
 
 # Python
 ac_cv_working_tzset=${ac_cv_working_tzset=yes}
+
+# openldap
+ac_cv_func_memcmp_working=yes
