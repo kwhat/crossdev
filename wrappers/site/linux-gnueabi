@@ -3,7 +3,6 @@ ac_cv_file__usr_share_sgml_X11_defs_ent=1
 ac_cv_func_calloc_0_nonnull=yes
 ac_cv_func_getpwuid_r=yes
 ac_cv_func_malloc_0_nonnull=yes
-ac_cv_func_memcmp_working=yes
 ac_cv_func_posix_getgrgid_r=yes
 ac_cv_func_posix_getpwnam_r=yes
 ac_cv_func_posix_getpwuid_r=yes

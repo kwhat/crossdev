@@ -111,7 +111,6 @@ mono_cv_uscore=${mono_cv_uscore=no}
 # general
 ac_cv_have_decl_sys_siglist=${ac_cv_have_decl_sys_siglist=no}
 ac_cv_func_malloc_0_nonnull=${ac_cv_func_malloc_0_nonnull=yes}
-ac_cv_func_memcmp_working=${ac_cv_func_memcmp_working=yes}
 ac_cv_type_uid_t=${ac_cv_type_uid_t=yes}
 
 # bash
@@ -179,7 +178,6 @@ ac_cv_file__usr_share_sgml_X11_defs_ent=1
 ac_cv_func_calloc_0_nonnull=yes
 ac_cv_func_getpwuid_r=yes
 ac_cv_func_malloc_0_nonnull=yes
-ac_cv_func_memcmp_working=yes
 ac_cv_func_posix_getgrgid_r=yes
 ac_cv_func_posix_getpwnam_r=yes
 ac_cv_func_posix_getpwuid_r=yes
