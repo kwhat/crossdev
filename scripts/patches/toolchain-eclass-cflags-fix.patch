@@ -1,0 +1,28 @@
+https://bugs.gentoo.org/792321
+https://bugs.gentoo.org/975839
+
+--- a/eclass/toolchain.eclass
++++ b/eclass/toolchain.eclass
+@@ -2225,7 +2225,7 @@
+ 	# These are set here so we have something sane at configure time
+ 	if is_crosscompile ; then
+ 		# Set this to something sane for both native and target
+-		CFLAGS="-O2 -pipe"
++		: ${CFLAGS:="-O2 -pipe"}
+ 		FFLAGS=${CFLAGS}
+ 		FCFLAGS=${CFLAGS}
+ 		GDCFLAGS=${CFLAGS}
+@@ -2354,11 +2354,12 @@
+ 		# some reason for putting it in here... --eradicator
+ 		BOOT_CFLAGS=${BOOT_CFLAGS-"-O2"}
+ 		emakeargs+=( BOOT_CFLAGS="${BOOT_CFLAGS}" )
+-
+ 		# ARMv8.1-M PACBTI requires branch protection when building target
+ 		# libraries to emit pointer authentication instructions in libgcc.
+ 		if [[ ${CTARGET} == *+pacbti* ]]; then
+ 			CFLAGS_FOR_TARGET+=" -mbranch-protection=standard"
++		fi
++		if [[ -n ${CFLAGS_FOR_TARGET} ]]; then
+ 			emakeargs+=( CFLAGS_FOR_TARGET="${CFLAGS_FOR_TARGET}" )
+ 		fi
+ 	else

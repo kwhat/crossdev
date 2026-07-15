@@ -1,0 +1,121 @@
+https://bugs.gentoo.org/978951
+
+--- a/libgloss/aarch64/Makefile.inc	2026-07-08 07:01:45.503394171 -0700
++++ b/libgloss/aarch64/Makefile.inc	2026-07-08 07:01:45.521904665 -0700
+@@ -20,13 +20,13 @@
+ 	%D%/rdimon-crt0.o \
+ 	$(%C%_SPECS)
+ 
+-%D%/crt0.$(OBJEXT): %D%/crt0.S
++%D%/crt0.$(OBJEXT): %D%/crt0.S | %D%/$(am__dirstamp)
+ 	$(AM_V_CPPAS)$(CPPASCOMPILE) -DSEMIHOST_V2 -o $@ -c $<
+-%D%/rdimon-crt0.$(OBJEXT): %D%/crt0.S
++%D%/rdimon-crt0.$(OBJEXT): %D%/crt0.S | %D%/$(am__dirstamp)
+ 	$(AM_V_CPPAS)$(CPPASCOMPILE) -DSEMIHOST_V2 -DARM_RDI_MONITOR -o $@ -c $<
+ 
+ ## Make copies of the scripts to facilitate in-tree bootstrapping.
+-%D%/%.specs: %D%/$(AARCH64_OBJTYPE)%.specs
++%D%/%.specs: %D%/$(AARCH64_OBJTYPE)%.specs | %D%/$(am__dirstamp)
+ 	$(AM_V_GEN)cp $< $@
+ 
+ CLEANFILES += $(%C%_SPECS)
+--- a/libgloss/arm/Makefile.inc	2026-07-08 07:01:45.502855496 -0700
++++ b/libgloss/arm/Makefile.inc	2026-07-08 07:01:45.525205541 -0700
+@@ -21,7 +21,7 @@
+ 	%D%/redboot-crt0.o \
+ 	%D%/redboot-syscalls.o
+ 
+-%D%/redboot-syscalls.o: %D%/redboot-syscalls.c
++%D%/redboot-syscalls.o: %D%/redboot-syscalls.c | %D%/$(am__dirstamp)
+ 	$(AM_V_CC)$(COMPILE) -DSEMIHOST_V2 -o $@ -c $<
+ 
+ ## rdpmon files.
+@@ -37,7 +37,7 @@
+ 	%D%/trap.S \
+ 	%D%/truncate.c
+ 
+-%D%/rdpmon-crt0.o: %D%/crt0.S
++%D%/rdpmon-crt0.o: %D%/crt0.S | %D%/$(am__dirstamp)
+ 	$(AM_V_CPPAS)$(CPPASCOMPILE) -DSEMIHOST_V2 -DARM_RDP_MONITOR -o $@ -c $<
+ 
+ ## rdimon files.
+@@ -58,10 +58,10 @@
+ %C%_RDIMON_CPPFLAGS = -DSEMIHOST_V2 -DARM_RDI_MONITOR
+ %C%_RDIMON_V2M_CPPFLAGS = $(%C%_RDIMON_CPPFLAGS) -DSEMIHOST_V2_MIXED_MODE
+ 
+-%D%/rdimon-crt0.o: %D%/crt0.S
++%D%/rdimon-crt0.o: %D%/crt0.S | %D%/$(am__dirstamp)
+ 	$(AM_V_CPPAS)$(CPPASCOMPILE) $(%C%_RDIMON_CPPFLAGS) -o $@ -c $<
+ 
+-%D%/rdimon-crt0-v2m.o: %D%/crt0.S
++%D%/rdimon-crt0-v2m.o: %D%/crt0.S | %D%/$(am__dirstamp)
+ 	$(AM_V_CPPAS)$(CPPASCOMPILE) $(%C%_RDIMON_V2M_CPPFLAGS) -o $@ -c $<
+ 
+ %C%_librdimon_a_SOURCES = $(%C%_librdpmon_a_SOURCES)
+@@ -77,11 +77,15 @@
+ multilibtool_DATA += \
+ 	$(%C%_SPECS)
+ 
++## crt0 objects in multilibtool_DATA are compiled by the implicit .S.o
++## rule, which lacks the am__dirstamp.
++%D%/crt0.o %D%/linux-crt0.o %D%/redboot-crt0.o: | %D%/$(am__dirstamp)
++
+ ## Make copies of the scripts to facilitate in-tree bootstrapping.
+-%D%/%.specs: %D%/$(ARM_OBJTYPE)%.specs
++%D%/%.specs: %D%/$(ARM_OBJTYPE)%.specs | %D%/$(am__dirstamp)
+ 	$(AM_V_GEN)cp $< $@
+ 
+-%D%/%.ld: %D%/$(ARM_OBJTYPE)%.ld
++%D%/%.ld: %D%/$(ARM_OBJTYPE)%.ld | %D%/$(am__dirstamp)
+ 	$(AM_V_GEN)cp $< $@
+ 
+ CLEANFILES += $(%C%_SPECS)
+--- a/libgloss/Makefile.in	2026-07-08 07:01:45.501994221 -0700
++++ b/libgloss/Makefile.in	2026-07-08 07:01:45.526181799 -0700
+@@ -10341,12 +10341,12 @@
+ @HAVE_DOC_TRUE@	$(AM_V_GEN)$(MAKEINFOHTML) $(AM_MAKEINFOHTMLFLAGS) $(MAKEINFOFLAGS) \
+ @HAVE_DOC_TRUE@		--split=node $< -o $(@D)
+ 
+-@CONFIG_AARCH64_TRUE@aarch64/crt0.$(OBJEXT): aarch64/crt0.S
++@CONFIG_AARCH64_TRUE@aarch64/crt0.$(OBJEXT): aarch64/crt0.S | aarch64/$(am__dirstamp)
+ @CONFIG_AARCH64_TRUE@	$(AM_V_CPPAS)$(CPPASCOMPILE) -DSEMIHOST_V2 -o $@ -c $<
+-@CONFIG_AARCH64_TRUE@aarch64/rdimon-crt0.$(OBJEXT): aarch64/crt0.S
++@CONFIG_AARCH64_TRUE@aarch64/rdimon-crt0.$(OBJEXT): aarch64/crt0.S | aarch64/$(am__dirstamp)
+ @CONFIG_AARCH64_TRUE@	$(AM_V_CPPAS)$(CPPASCOMPILE) -DSEMIHOST_V2 -DARM_RDI_MONITOR -o $@ -c $<
+ 
+-@CONFIG_AARCH64_TRUE@aarch64/%.specs: aarch64/$(AARCH64_OBJTYPE)%.specs
++@CONFIG_AARCH64_TRUE@aarch64/%.specs: aarch64/$(AARCH64_OBJTYPE)%.specs | aarch64/$(am__dirstamp)
+ @CONFIG_AARCH64_TRUE@	$(AM_V_GEN)cp $< $@
+ 
+ @CONFIG_AARCH64_TRUE@aarch64/cpu-init/$(am__dirstamp):
+@@ -10359,22 +10359,24 @@
+ @CONFIG_AARCH64_TRUE@aarch64/cpu-init/rdimon-aem-v8-r.$(OBJEXT): aarch64/cpu-init/rdimon-aem-el3.S aarch64/cpu-init/$(am__dirstamp)
+ @CONFIG_AARCH64_TRUE@	$(AM_V_CC)$(COMPILE) $(aarch64_cpu_init_CPPFLAGS) -DARM_RDI_MONITOR -DBUILD_FOR_R_PROFILE -o $@ -c $<
+ 
+-@CONFIG_ARM_TRUE@arm/redboot-syscalls.o: arm/redboot-syscalls.c
++@CONFIG_ARM_TRUE@arm/redboot-syscalls.o: arm/redboot-syscalls.c | arm/$(am__dirstamp)
+ @CONFIG_ARM_TRUE@	$(AM_V_CC)$(COMPILE) -DSEMIHOST_V2 -o $@ -c $<
+ 
+-@CONFIG_ARM_TRUE@arm/rdpmon-crt0.o: arm/crt0.S
++@CONFIG_ARM_TRUE@arm/rdpmon-crt0.o: arm/crt0.S | arm/$(am__dirstamp)
+ @CONFIG_ARM_TRUE@	$(AM_V_CPPAS)$(CPPASCOMPILE) -DSEMIHOST_V2 -DARM_RDP_MONITOR -o $@ -c $<
+ 
+-@CONFIG_ARM_TRUE@arm/rdimon-crt0.o: arm/crt0.S
++@CONFIG_ARM_TRUE@arm/rdimon-crt0.o: arm/crt0.S | arm/$(am__dirstamp)
+ @CONFIG_ARM_TRUE@	$(AM_V_CPPAS)$(CPPASCOMPILE) $(arm_RDIMON_CPPFLAGS) -o $@ -c $<
+ 
+-@CONFIG_ARM_TRUE@arm/rdimon-crt0-v2m.o: arm/crt0.S
++@CONFIG_ARM_TRUE@arm/rdimon-crt0-v2m.o: arm/crt0.S | arm/$(am__dirstamp)
+ @CONFIG_ARM_TRUE@	$(AM_V_CPPAS)$(CPPASCOMPILE) $(arm_RDIMON_V2M_CPPFLAGS) -o $@ -c $<
+ 
+-@CONFIG_ARM_TRUE@arm/%.specs: arm/$(ARM_OBJTYPE)%.specs
++@CONFIG_ARM_TRUE@arm/crt0.o arm/linux-crt0.o arm/redboot-crt0.o: | arm/$(am__dirstamp)
++
++@CONFIG_ARM_TRUE@arm/%.specs: arm/$(ARM_OBJTYPE)%.specs | arm/$(am__dirstamp)
+ @CONFIG_ARM_TRUE@	$(AM_V_GEN)cp $< $@
+ 
+-@CONFIG_ARM_TRUE@arm/%.ld: arm/$(ARM_OBJTYPE)%.ld
++@CONFIG_ARM_TRUE@arm/%.ld: arm/$(ARM_OBJTYPE)%.ld | arm/$(am__dirstamp)
+ @CONFIG_ARM_TRUE@	$(AM_V_GEN)cp $< $@
+ 
+ @CONFIG_ARM_TRUE@arm/cpu-init/$(am__dirstamp):
